@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>互動課表（GitHub 版）</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>互動課表（GitHub Pages 版）</h1>
+
+<table id="schedule">
+    <tr>
+        <th></th>
+        <th>週一</th><th>週二</th><th>週三</th><th>週四</th><th>週五</th>
+    </tr>
+
+    <!-- 10 節課 -->
+    <script>
+        for (let p = 1; p <= 10; p++) {
+            document.write("<tr>");
+            document.write(`<th>第 ${p} 節</th>`);
+            for (let d = 1; d <= 5; d++) {
+                document.write(`<td class="cell" data-day="${d}" data-period="${p}"></td>`);
+            }
+            document.write("</tr>");
+        }
+    </script>
+</table>
+
+<button id="saveBtn">下載課表 CSV</button>
+
+<script src="script.js"></script>
+</body>
+</html>
