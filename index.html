@@ -1,35 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <title>互動課表（GitHub 版）</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>互動課表＋排程與提醒（GitHub Pages 版）</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <h1>互動課表＋排程與提醒系統</h1>
 
-<h1>互動課表（GitHub Pages 版）</h1>
+  <section id="board-area">
+    <div class="controls">
+      <button id="clearBtn">清除所有課表</button>
+      <button id="exportCsvBtn">下載課表 CSV</button>
+      <input id="uploadCsv" type="file" accept=".csv" />
+      <label for="uploadCsv" class="fileBtn">上傳 CSV 並載入</label>
+    </div>
 
-<table id="schedule">
-    <tr>
-        <th></th>
-        <th>週一</th><th>週二</th><th>週三</th><th>週四</th><th>週五</th>
-    </tr>
+    <div id="table-wrap">
+      <table id="schedule">
+        <thead>
+          <tr><th></th><th>週一</th><th>週二</th><th>週三</th><th>週四</th><th>週五</th></tr>
+        </thead>
+        <tbody id="schedule-body">
+          <!-- JS 會插入 10 rows -->
+        </tbody>
+      </table>
+    </div>
 
-    <!-- 10 節課 -->
-    <script>
-        for (let p = 1; p <= 10; p++) {
-            document.write("<tr>");
-            document.write(`<th>第 ${p} 節</th>`);
-            for (let d = 1; d <= 5; d++) {
-                document.write(`<td class="cell" data-day="${d}" data-period="${p}"></td>`);
-            }
-            document.write("</tr>");
-        }
-    </script>
-</table>
+    <div id="form-hint">拖曳選取格子然後放開滑鼠以填入課程（可跨多節）</div>
+  </section>
 
-<button id="saveBtn">下載課表 CSV</button>
+  <!-- 小表單：填入課程資訊 -->
+  <div id="courseModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>輸入課程資訊</h3>
+      <label>課名：<input id="input_name" /></label>
+      <label>學分：<input id="input_credit" type="number" min="0" value="2" /></label>
+      <label>類別：
+        <select id="input_type">
+          <option>必修</option>
+          <option>選修</option>
+          <option>通識</option>
+          <option>其他</option>
+        </select>
+      </label>
+      <input id="input_type_other" class="hidden" placeholder="請輸入類別" />
+      <label>甜度 (1~10)：<input id="input_sweet" type="number" min="1" max="10" value="5" /></label>
+      <label>涼度 (1~10)：<input id="input_cool" type="number" min="1" max="10" value="5" /></label>
+
+      <div class="modal-actions">
+        <button id="modalCancel">取消</button>
+        <button id="modalSave">儲存並套用</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 課程清單（同步） -->
+  <section id="course-list-area">
+    <h2>課程列表（下方會同步新增）</h2>
+    <table id="courseList">
+      <thead><tr><th>課名</th><th>學分</th><th>類別</th><th>甜度</th><th>涼度</th><th>格次</th><th>動作</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- 優化 / 排程區 -->
+  <section id="optimizer-area">
+    <h2>優化與排程</h2>
+    <div class="optimizer-controls">
+      <label>今日可讀總分鐘數：<input id="totalMinutes" type="number" value="180" /></label>
+      <label>每科最小分鐘數：<input id="minMinutes" type="number" value="30" /></label>
+      <label>分鐘四捨五入到：<input id="roundTo" type="number" value="30" /></label>
+      <button id="calcMinutesBtn">計算分鐘分配（模擬 optimize_minutes）</button>
+    </div>
+
+    <div class="block-controls">
+      <label>讀書開始時間 (HH:MM)：<input id="startTime" type="time" value="19:00" /></label>
+      <label>讀書結束時間 (HH:MM)：<input id="endTime" type="time" value="22:00" /></label>
+      <button id="makeBlocksBtn">生成 30 分鐘 block 並分配（模擬 optimize_blocks）</button>
+      <button id="exportScheduleBtn">下載排程 CSV</button>
+      <button id="startReminderBtn">啟動提醒系統（瀏覽器通知）</button>
+    </div>
+
+    <div id="minutesResult" class="panel"></div>
+    <div id="blocksResult" class="panel"></div>
+  </section>
 
 <script src="script.js"></script>
 </body>
 </html>
+
