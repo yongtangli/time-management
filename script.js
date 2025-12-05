@@ -31,38 +31,61 @@ for(let p of periods){
 
 // ---------- 全域狀態 ----------
 let isMouseDown = false;
-let selection = new Set(); // key = day-period
-let dragStarted = false;
-let courses = []; // 每個元素 {id, name, credit, type, sweet, cool, cells: [ "d-p", ... ], color}
-let colorMap = {}; // name -> color
+let dragMode = null; // "select" or "unselect"
+let selection = new Set();
 
-// helpers
-function keyOf(cell){ return `${cell.dataset.day}-${cell.dataset.period}`; }
-function cellByKey(k){ const [d,p]=k.split("-"); return document.querySelector(`td[data-day='${d}'][data-period='${p}']`); }
-
-// ---------- 拖曳選取邏輯 ----------
+// ---------- 拖曳選取邏輯（修正版） ----------
 function cellMouseDown(e){
   e.preventDefault();
-  isMouseDown = true;
-  dragStarted = true;
   const cell = e.currentTarget;
-  toggleSelectCell(cell);
-}
-function cellMouseOver(e){
-  if(isMouseDown){
-    toggleSelectCell(e.currentTarget);
+  const k = keyOf(cell);
+
+  isMouseDown = true;
+
+  // 判斷這次拖曳是「選取」還是「取消」
+  if(selection.has(k)){
+    dragMode = "unselect";
+    selection.delete(k);
+    cell.classList.remove("selected");
+  } else {
+    dragMode = "select";
+    selection.add(k);
+    cell.classList.add("selected");
   }
 }
-function cellMouseUp(e){
-  if(dragStarted){
-    dragStarted = false;
-    isMouseDown = false;
-    if(selection.size>0){
-      openCourseModal();
+
+function cellMouseOver(e){
+  if(!isMouseDown) return;
+  const cell = e.currentTarget;
+  const k = keyOf(cell);
+
+  if(dragMode === "select"){
+    if(!selection.has(k)){
+      selection.add(k);
+      cell.classList.add("selected");
+    }
+  } else if(dragMode === "unselect"){
+    if(selection.has(k)){
+      selection.delete(k);
+      cell.classList.remove("selected");
     }
   }
 }
-document.addEventListener("mouseup", ()=>{ isMouseDown=false; });
+
+function cellMouseUp(e){
+  isMouseDown = false;
+  dragMode = null;
+
+  if(selection.size > 0){
+    openCourseModal();
+  }
+}
+
+document.addEventListener("mouseup", ()=>{
+  isMouseDown = false;
+  dragMode = null;
+});
+
 
 // 點選選取（切換）
 function toggleSelectCell(cell){
